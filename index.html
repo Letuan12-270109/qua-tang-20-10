@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#64223a" />
+    <meta name="description" content="Một món quà nhỏ bằng cả tấm lòng dành tặng chị nhân ngày Phụ nữ Việt Nam 20/10." />
+    <title>Gửi chị ngày 20/10</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;1,500;1,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="locked">
+    <div class="paper-grain" aria-hidden="true"></div>
+
+    <section class="opening-story" id="openingStory" aria-label="Món quà ngày 20 tháng 10">
+      <article class="story-scene story-cover" data-story-scene="0" aria-hidden="false">
+        <div class="cover-frame" aria-hidden="true"><span>20</span><i></i><span>10</span></div>
+        <div class="cover-copy">
+          <p class="story-kicker">Một món quà nhỏ · gửi người chị em thương</p>
+          <h1>Hôm nay,<br /><em>mọi điều đẹp đẽ</em><br />đều dành cho chị.</h1>
+          <p class="story-subtitle">Chạm để mở màn món quà đặc biệt dành riêng cho chị.</p>
+          <button class="story-button" type="button" data-story-next>
+            Bắt đầu trình diễn <span>↓</span>
+          </button>
+        </div>
+        <div class="cover-seal" aria-hidden="true"><span>20</span><i>tháng mười</i><span>10</span></div>
+        <p class="cover-footnote">Một câu chuyện nhỏ dành riêng cho chị</p>
+      </article>
+
+      <article class="story-scene story-magic" data-story-scene="1" aria-label="Đĩa ma pháp 3D mở màn" aria-hidden="true" hidden>
+        <iframe class="magic-disc-frame" id="magicDiscFrame" title="Hoạt cảnh đĩa ma pháp 3D" data-src="magic-disc.html" loading="lazy" allow="fullscreen" referrerpolicy="no-referrer"></iframe>
+        <div class="magic-photo-burst" aria-hidden="true">
+          <img class="magic-photo" src="images/sister-01.jpg" alt="" style="--photo-x:-68vw;--photo-y:-58vh;--photo-delay:0s;--grid-x:calc(0px - min(22vw,14vh));--grid-y:calc(0px - min(22vw,14vh))" />
+          <img class="magic-photo" src="images/sister-02.jpg" alt="" style="--photo-x:68vw;--photo-y:-58vh;--photo-delay:1.5s;--grid-x:min(22vw,14vh);--grid-y:calc(0px - min(22vw,14vh))" />
+          <img class="magic-photo" src="images/sister-03.jpg" alt="" style="--photo-x:-68vw;--photo-y:58vh;--photo-delay:3s;--grid-x:calc(0px - min(22vw,14vh));--grid-y:min(22vw,14vh)" />
+          <img class="magic-photo" src="images/sister-04.jpg" alt="" style="--photo-x:68vw;--photo-y:58vh;--photo-delay:4.5s;--grid-x:min(22vw,14vh);--grid-y:min(22vw,14vh)" />
+          <img class="magic-finale-photo" src="images/sister-05.jpg" alt="Chị trong một khoảnh khắc đáng nhớ" />
+          <canvas class="magic-flower-canvas" id="magicFlowerCanvas" aria-hidden="true"></canvas>
+        </div>
+        <svg class="magic-return-threads" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <defs><linearGradient id="magicThreadGradient"><stop stop-color="#fff4db"/><stop offset=".55" stop-color="#f3c1d0"/><stop offset="1" stop-color="#e7bb75"/></linearGradient></defs>
+          <line class="magic-thread" x1="50" y1="50" x2="-18" y2="-8" pathLength="100" style="--thread-delay:0s" />
+          <line class="magic-thread" x1="50" y1="50" x2="118" y2="-8" pathLength="100" style="--thread-delay:.08s" />
+          <line class="magic-thread" x1="50" y1="50" x2="-18" y2="108" pathLength="100" style="--thread-delay:.16s" />
+          <line class="magic-thread" x1="50" y1="50" x2="118" y2="108" pathLength="100" style="--thread-delay:.24s" />
+        </svg>
+        <p class="magic-photo-message" aria-hidden="true">từ</p>
+        <div class="magic-disc-vignette" aria-hidden="true"></div>
+        <button class="story-back" type="button" data-story-prev>← <span>Trở lại</span></button>
+      </article>
+
+      <article class="story-scene story-fireworks" data-story-scene="2" aria-hidden="true" hidden>
+        <canvas class="fireworks-canvas" id="fireworksCanvas" aria-hidden="true"></canvas>
+        <div class="fireworks-halo" aria-hidden="true"></div>
+        <div class="fireworks-horizon" aria-hidden="true"></div>
+        <div class="fireworks-frame" aria-hidden="true">
+          <i class="frame-corner frame-top-left"></i><i class="frame-corner frame-top-right"></i>
+          <i class="frame-corner frame-bottom-left"></i><i class="frame-corner frame-bottom-right"></i>
+        </div>
+        <div class="fireworks-date" aria-hidden="true"><span>20 <i>·</i> 10</span><small>tháng mười</small></div>
+        <svg class="fireworks-crest" viewBox="0 0 300 90" aria-hidden="true">
+          <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 69c36 0 42-37 77-37 18 0 28 11 40 23m111 14c-36 0-42-37-77-37-18 0-28 11-40 23"/>
+            <path d="M43 58c10-12 21-13 31-5-6 13-17 16-31 5Zm42-19c10-12 21-13 31-5-6 13-17 16-31 5Zm129 19c-10-12-21-13-31-5 6 13 17 16 31 5Zm-42-19c-10-12-21-13-31-5 6 13 17 16 31 5Z"/>
+            <path d="M139 37c-12-12-4-23 6-15 6-13 17-8 12 4 15-2 16 10 2 13 8 11-3 18-10 7-9 10-20 2-10-9Z"/>
+          </g>
+          <circle cx="150" cy="43" r="3" fill="currentColor"/>
+        </svg>
+        <div class="fireworks-petals" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <button class="story-back" type="button" data-story-prev>← <span>Trở lại</span></button>
+        <div class="fireworks-end-card" aria-hidden="true">
+          <span>20 · 10</span>
+        </div>
+      </article>
+
+      <article class="story-scene story-blossom" data-story-scene="3" aria-hidden="true" hidden>
+        <div class="blossom-glow" aria-hidden="true"></div>
+        <button class="story-back" type="button" data-story-prev>← <span>Trở lại</span></button>
+        <svg class="blossom-bouquet" viewBox="0 0 860 1024" aria-hidden="true" focusable="false">
+          <defs><clipPath id="storyBouquetClip"><polygon points="0,0 5,0 501,8 501,16 503,24 503,32 526,40 532,48 683,56 687,64 691,72 696,80 698,88 701,96 704,104 706,112 709,120 712,128 715,136 717,144 720,152 722,160 725,168 727,176 792,184 792,192 792,200 791,208 789,216 787,224 785,232 783,240 781,248 818,256 818,264 818,272 816,280 811,288 807,296 803,304 808,312 822,320 836,328 852,336 853,344 853,352 850,360 844,368 837,376 831,384 824,392 820,400 820,408 817,416 811,424 804,432 797,440 790,448 785,456 798,464 807,472 812,480 813,488 813,496 812,504 806,512 796,520 787,528 776,536 767,544 757,552 746,560 737,568 733,576 726,584 718,592 708,600 704,608 700,616 697,624 693,632 688,640 683,648 678,656 672,664 665,672 658,680 646,688 629,696 568,704 568,712 571,720 580,728 587,736 595,744 602,752 610,760 617,768 625,776 632,784 639,792 644,800 644,808 644,816 643,824 640,832 641,840 650,848 659,856 665,864 672,872 677,880 681,888 685,896 687,904 687,912 684,920 677,928 673,936 671,944 668,952 665,960 662,968 445,976 398,984 399,992 401,1000 401,1008 401,1016 5,1024 0,1024" /></clipPath></defs>
+          <image href="images/bouquet-a10.png" width="1536" height="1024" clip-path="url(#storyBouquetClip)" />
+        </svg>
+        <div class="blossom-copy">
+          <p class="story-kicker">Sau ánh sáng là một lời chúc</p>
+          <h2>Mong những ngày của chị<br /><em>luôn nở hoa.</em></h2>
+          <p>Chúc chị luôn bình yên, rạng rỡ và được yêu thương thật nhiều.</p>
+          <button class="story-button" type="button" id="enterGift">
+            Mở món quà của em <span>↗</span>
+          </button>
+        </div>
+      </article>
+    </section>
+
+    <section class="intro" id="intro" aria-label="Mở phong thư" aria-hidden="true">
+      <div class="intro-flower flower-a" aria-hidden="true">✿</div>
+      <div class="intro-flower flower-b" aria-hidden="true">❀</div>
+      <p class="eyebrow">Một món quà nhỏ · 20 tháng 10</p>
+      <button class="envelope" id="openGift" type="button" aria-label="Mở phong thư">
+        <span class="envelope-back"></span>
+        <span class="letter">
+          <span class="letter-mark">Gửi chị</span>
+          <span class="tiny-heart">♥</span>
+        </span>
+        <span class="envelope-front"></span>
+        <span class="envelope-flap"></span>
+        <span class="wax-seal">20<span>/10</span></span>
+      </button>
+      <button class="open-label" id="openLabel" type="button">Chạm để mở món quà <span>↗</span></button>
+    </section>
+
+    <main id="mainContent" aria-hidden="true">
+      <header class="hero">
+        <nav class="nav" aria-label="Điều hướng chính">
+          <a class="brand" href="#top" aria-label="Về đầu trang">20<span>·</span>10</a>
+          <a class="nav-link" href="#garden">Một vườn hoa cho chị <span>↓</span></a>
+        </nav>
+
+        <div class="hero-content" id="top">
+          <div class="date-card" aria-label="Ngày 20 tháng 10">
+            <span>Tháng mười</span>
+            <strong>20</strong>
+            <small>Ngày Phụ nữ Việt Nam</small>
+          </div>
+          <div class="hero-copy">
+            <p class="eyebrow">Dành riêng cho người chị tuyệt vời</p>
+            <h1>Gửi chị,<br /><em>một trời thương mến.</em></h1>
+            <p class="lead">Cảm ơn chị vì đã luôn là người lắng nghe, luôn sẵn sàng trả lời câu hỏi của em.</p>
+            <a class="text-link" href="#letter">Đọc lời em muốn nói <span>↘</span></a>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="art-orbit orbit-one"></div>
+            <div class="art-orbit orbit-two"></div>
+            <span class="art-caption">For you, always</span>
+            <svg class="hero-bouquet" viewBox="0 0 789 1024" aria-hidden="true" focusable="false">
+          <defs><clipPath id="heroBouquetClip"><polygon points="0,0 5,0 377,8 478,16 479,24 480,32 482,40 606,48 609,56 693,64 696,72 696,80 695,88 695,96 686,104 686,112 679,120 679,128 677,136 694,144 708,152 721,160 732,168 736,176 736,184 736,192 732,200 735,208 745,216 754,224 759,232 760,240 760,248 757,256 751,264 745,272 740,280 734,288 729,296 724,304 725,312 734,320 743,328 752,336 758,344 762,352 762,360 762,368 754,376 766,384 771,392 771,400 771,408 764,416 755,424 762,432 768,440 772,448 777,456 780,464 782,472 782,480 782,488 772,496 759,504 748,512 735,520 723,528 710,536 698,544 695,552 692,560 689,568 685,576 681,584 675,592 668,600 619,608 615,616 612,624 607,632 601,640 593,648 548,656 555,664 561,672 565,680 571,688 575,696 579,704 583,712 588,720 591,728 591,736 590,744 580,752 557,760 552,768 562,776 571,784 580,792 587,800 595,808 602,816 606,824 606,832 606,840 603,848 602,856 599,864 584,872 582,880 580,888 577,896 576,904 574,912 574,920 573,928 572,936 571,944 568,952 563,960 552,968 541,976 476,984 468,992 394,1000 382,1008 369,1016 5,1024 0,1024" /></clipPath></defs>
+          <image href="images/bouquet-a9.png" width="1536" height="1024" clip-path="url(#heroBouquetClip)" />
+        </svg>
+            <span class="art-note">một bó hoa<br />gửi người em thương</span>
+          </div>
+        </div>
+        <div class="scroll-note"><span></span> Cuộn xuống để nhận thêm yêu thương</div>
+      </header>
+
+      <section class="letter-section reveal" id="letter">
+        <div class="section-number">01</div>
+        <div class="letter-paper">
+          <div class="letter-heading">
+            <p class="eyebrow">Một lá thư thật lòng</p>
+            <span class="postmark">20 · 10<br />VIỆT NAM</span>
+          </div>
+          <h2>Chị yêu quý,</h2>
+          <div class="letter-body">
+            <p>Chúc chị ngày 20/10 thật vui, luôn mạnh khỏe, bình an và gặp nhiều điều may mắn.</p>
+            <p>Mong mỗi ngày của chị đều có nắng dịu ngoài hiên, có tiếng cười trong nhà và những người thương ở bên.</p>
+            <p>Chúc chị luôn rạng rỡ như hoa, bước đi thong thả giữa tháng ngày êm đềm; mọi điều tốt đẹp rồi sẽ nhẹ nhàng tìm đến chị.</p>
+          </div>
+          <div class="signature">
+            <span>Thương chị thật nhiều,</span>
+            <strong>Em ♡</strong>
+          </div>
+        </div>
+      </section>
+
+<section class="garden reveal" id="garden" aria-labelledby="garden-title">
+        <div class="garden-copy">
+          <p class="eyebrow">Món quà cuối cùng</p>
+          <h2 id="garden-title">Tặng chị một<br /><em>vườn hoa nhỏ</em></h2>
+          <p>Mỗi bông hoa là một lời chúc. Chạm vào khu vườn để gieo thêm niềm vui cho ngày hôm nay.</p>
+          <button class="bloom-button" id="bloomButton" type="button">
+            <span class="button-icon">✿</span>
+            Làm nở một bông hoa
+          </button>
+          <p class="bloom-count" id="bloomCount" aria-live="polite">Khu vườn có 4 bông hoa và 4 lời chúc ♡</p>
+        </div>
+        <div class="garden-stage" id="gardenStage" role="group" aria-label="Khu vườn hoa tương tác">
+          <div class="sun" aria-hidden="true"></div>
+          <div class="hill hill-back" aria-hidden="true"></div>
+          <div class="hill hill-front" aria-hidden="true"></div>
+          <div class="garden-flower f1" aria-hidden="true"><span class="garden-flower-sprite" data-row="0" style="--flower-col:0"></span></div>
+          <div class="garden-flower f2" aria-hidden="true"><span class="garden-flower-sprite" data-row="0" style="--flower-col:1"></span></div>
+          <div class="garden-flower f3" aria-hidden="true"><span class="garden-flower-sprite" data-row="1" style="--flower-col:0"></span></div>
+          <div class="garden-flower f4" aria-hidden="true"><span class="garden-flower-sprite" data-row="1" style="--flower-col:2"></span></div>
+          <span class="garden-hint">chạm vào đây ✦</span>
+        </div>
+      </section>
+
+      <footer class="closing reveal">
+        <div class="closing-flower" aria-hidden="true">❀</div>
+        <p class="eyebrow">20 · 10 · Một ngày thật đẹp</p>
+        <h2>Chúc chị luôn được<br /><em>yêu thương và nâng niu.</em></h2>
+        <p>Mong nụ cười sẽ ở bên chị hôm nay, ngày mai và thật nhiều ngày sau nữa.</p>
+        <div class="heart-line"><span></span>♥<span></span></div>
+        <small>Được làm bằng tất cả yêu thương</small>
+      </footer>
+    </main>
+
+    <script src="script.js"></script>
+    <script src="autoplay-music.js"></script>
+    <script src="visit-notify.js" defer></script>
+  </body>
+</html>

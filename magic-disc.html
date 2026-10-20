@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đĩa Ma Pháp 3D · Gửi Chị 20/10</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #04020a;
+    }
+    canvas#c {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="c" title="Chạm hoặc nhấp chuột để kích hoạt lại hiệu ứng bung xoay đĩa mở đầu"></canvas>
+  <script>
+    const cv = document.getElementById('c');
+    const x = cv.getContext('2d');
+    const TAU = Math.PI * 2, PI = Math.PI;
+
+    let W = 0, H = 0, CX = 0, CY = 0, F = 860;
+    const ZN = 160, ZF = 1850, N = 8, LOOP = 10;
+    const RR = [46, 80, 116, 154, 194, 236];
+    const PAL = [46, 275, 190, 320, 140, 225, 20];
+    const GLYPHS = ['★', '♥', '✦', '✧', '☾', '♪', '●', '❄', '❇', '⚡', '❀', '✴'];
+    const ANIMALS = ['🌸', '🌹', '🌺', '🌻', '🌼', '🌷', '🪷', '💐', '🏵️', '🪻'];
+
+    let rs = 424242;
+    const rnd = () => {
+      rs = (rs * 1664525 + 1013904223) >>> 0;
+      return rs / 4294967296;
+    };
+
+    // Bảng tra lượng giác cho đường tròn 36 đoạn & 10 đỉnh & 14 tia
+    const RING_STEPS = 36;
+    const COS_36 = new Float32Array(RING_STEPS + 1);
+    const SIN_36 = new Float32Array(RING_STEPS + 1);
+    for (let i = 0; i <= RING_STEPS; i++) {
+      const a = (i / RING_STEPS) * TAU;
+      COS_36[i] = Math.cos(a);
+      SIN_36[i] = Math.sin(a);
+    }
+
+    const COS_10 = new Float32Array(10);
+    const SIN_10 = new Float32Array(10);
+    for (let i = 0; i < 10; i++) {
+      const a = (i / 10) * TAU;
+      COS_10[i] = Math.cos(a);
+      SIN_10[i] = Math.sin(a);
+    }
+
+    // Lưu đệm (Sprite Cache) cho ký tự và hoa, giữ nguyên 2 lớp vẽ phát sáng như bản gốc
+    const spriteCache = new Map();
+    function getGlyphSprite(ch, hue) {
+      const key = ch + '_' + hue;
+      let sp = spriteCache.get(key);
+      if (sp) return sp;
+      const sz = 64, half = sz * 0.5;
+      sp = document.createElement('canvas');
+      sp.width = sz;
+      sp.height = sz;
+      const sc = sp.getContext('2d');
+      sc.textAlign = 'center';
+      sc.textBaseline = 'middle';
+      sc.font = '44px serif';
+      sc.fillStyle = 'hsla(' + hue + ',100%,80%,0.35)';
+      sc.fillText(ch, half, half);
+      sc.font = '39.6px serif';
+      sc.fillStyle = 'hsla(' + hue + ',100%,92%,1)';
+      sc.fillText(ch, half, half);
+      spriteCache.set(key, sp);
+      return sp;
+    }
+
+    let T = 0, ph = 0, introT = 0;
+    let BGC = null, VGC = null;
+    const discs = [];
+    const stars = [];
+
+    for (let i = 0; i < N; i++) {
+      const g1 = GLYPHS[(rnd() * GLYPHS.length) | 0];
+      const g2 = GLYPHS[(rnd() * GLYPHS.length) | 0];
+      const an = ANIMALS[(rnd() * ANIMALS.length) | 0];
+      const spd = RR.map(() => (0.4 + rnd() * 1.5) * (rnd() < 0.5 ? -1 : 1));
+      const sc = 0.78 + rnd() * 0.55;
+      const hueBase = (rnd() * 360) | 0;
+      const rad = RR.map(v => v * sc);
+      const hues = [];
+      for (let k = 0; k < 20; k++) {
+        hues.push((hueBase + k * 42) % 360);
+      }
+      const rayHues = [];
+      for (let m = 0; m < 14; m++) {
+        rayHues.push(((hueBase + 40 * Math.sin(m)) % 360 + 360) % 360);
+      }
+
+      const gList = [
+        { ch: g1, ring: 4, n: 8, fm: 17, sprites: [] },
+        { ch: g2, ring: 2, n: 6, fm: 17, sprites: [] },
+        { ch: an, ring: 5, n: 6, fm: 24, sprites: [] }
+      ];
+      for (const gg of gList) {
+        for (let m = 0; m < gg.n; m++) {
+          gg.sprites.push(getGlyphSprite(gg.ch, hues[gg.ring + m]));
+        }
+      }
+
+      discs.push({
+        off: i / N,
+        hueA: PAL[i % PAL.length],
+        hueB: PAL[(i + 3) % PAL.length],
+        tph: rnd() * TAU,
+        spd,
+        sc,
+        rad,
+        hueBase,
+        hues,
+        rayHues,
+        g: gList,
+        z: 0
+      });
+    }
+
+    const sortedDiscs = discs.slice();
+
+    function initStars() {
+      stars.length = 0;
+      for (let i = 0; i < 180; i++) {
+        stars.push({
+          x: rnd() * W,
+          y: rnd() * H,
+          s: 0.6 + rnd() * 1.8,
+          p: rnd() * TAU
+        });
+      }
+    }
+
+    function resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      W = Math.max(1, Math.floor(window.innerWidth * dpr));
+      H = Math.max(1, Math.floor(window.innerHeight * dpr));
+      cv.width = W;
+      cv.height = H;
+      CX = W * 0.5;
+      CY = H * 0.5;
+      F = Math.min(W, H) * 0.8;
+      BGC = null;
+      VGC = null;
+      initStars();
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Nhấp hoặc chạm vào màn hình để xem lại hiệu ứng bung xoay đĩa lúc đầu
+    cv.addEventListener('pointerdown', () => {
+      introT = 0;
+    });
+
+    // Vector cơ sở 3D tính trực tiếp không tạo mảng phụ
+    let U0 = 1, U1 = 0, U2 = 0;
+    let V0 = 0, V1 = 1, V2 = 0;
+    function updateBasis(tx, ty) {
+      const cx = Math.cos(tx), sx = Math.sin(tx);
+      const cy = Math.cos(ty), sy = Math.sin(ty);
+      U0 = cy;
+      U1 = 0;
+      U2 = -sy;
+      V0 = sx * sy;
+      V1 = cx;
+      V2 = sx * cy;
+    }
+
+    let PX = 0, PY = 0, PS = 0;
+    function pOnDiscTrig(Zc, r, c, s) {
+      const pz = Zc + r * (c * U2 + s * V2);
+      if (pz < ZN * 0.5) return false;
+      PS = F / pz;
+      PX = CX + r * (c * U0 + s * V0) * PS;
+      PY = CY + r * (c * U1 + s * V1) * PS;
+      return true;
+    }
+
+    function ring3D(Zc, r, spin, ss, hue, al) {
+      const cs = Math.cos(spin), sn = Math.sin(spin);
+      x.beginPath();
+      let first = true;
+      for (let i = 0; i <= RING_STEPS; i++) {
+        const c = COS_36[i] * cs - SIN_36[i] * sn;
+        const s = SIN_36[i] * cs + COS_36[i] * sn;
+        if (!pOnDiscTrig(Zc, r, c, s)) continue;
+        if (first) {
+          x.moveTo(PX, PY);
+          first = false;
+        } else {
+          x.lineTo(PX, PY);
+        }
+      }
+      x.closePath();
+      x.strokeStyle = 'hsla(' + hue + ',95%,72%,' + (al * 0.22) + ')';
+      x.lineWidth = 4.2 * ss;
+      x.stroke();
+      x.strokeStyle = 'hsla(' + hue + ',100%,88%,' + al + ')';
+      x.lineWidth = 1.1 * ss;
+      x.stroke();
+    }
+
+    function node3DTrig(Zc, r, c, s, sz, hue, a) {
+      if (!pOnDiscTrig(Zc, r, c, s)) return;
+      const R = sz * PS;
+      x.fillStyle = 'hsla(' + hue + ',100%,68%,' + (a * 0.5) + ')';
+      x.beginPath();
+      x.arc(PX, PY, R * 2.2, 0, TAU);
+      x.fill();
+      x.fillStyle = 'hsla(' + hue + ',100%,93%,' + a + ')';
+      x.beginPath();
+      x.arc(PX, PY, R * 0.9, 0, TAU);
+      x.fill();
+    }
+
+    function drawDisc3D(d, spinBoost, scaleOpen, GA) {
+      const p = (ph + d.off) % 1;
+      const Zc = ZF - p * (ZF - ZN);
+      let al = 1;
+      if (Zc > ZF - 300) al = (ZF - Zc) / 300;
+      if (Zc < 480) al = Math.max(0, (Zc - ZN) / (480 - ZN));
+      al *= GA;
+      if (al <= 0.005) return;
+
+      const pr = 0.6 + 0.4 * Math.sin(ph * TAU * 2 + d.off * 6);
+      updateBasis(
+        0.42 * Math.sin(ph * TAU + d.tph),
+        0.32 * Math.cos(ph * TAU * 0.7 + d.tph)
+      );
+      const ss = Math.min(4.5, Math.max(0.5, (F / Zc) * 0.9));
+      const rad = d.rad;
+      const hues = d.hues;
+      const phTau = (ph * TAU + spinBoost) * 0.5;
+      const phTau3 = ph * TAU * 3;
+
+      // 1. Vẽ 6 vòng đa sắc + 10 hạt sáng xoay đa sắc trên mỗi vòng
+      for (let k = 0; k < 6; k++) {
+        const r = rad[k] * scaleOpen;
+        const spin = d.spd[k] * phTau;
+        const hue = hues[k];
+        ring3D(Zc, r, spin, ss * (k % 3 ? 0.8 : 1.1), hue, 0.5 * pr * al);
+
+        const cs = Math.cos(spin), sn = Math.sin(spin);
+        for (let i = 0; i < 10; i++) {
+          const tw = 0.4 + 0.6 * Math.abs(Math.sin(phTau3 + i + k));
+          const c = COS_10[i] * cs - SIN_10[i] * sn;
+          const s = SIN_10[i] * cs + COS_10[i] * sn;
+          node3DTrig(
+            Zc,
+            r,
+            c,
+            s,
+            (i % 2 ? 1.5 : 2.3) * tw + 0.5,
+            hues[k + i],
+            0.75 * tw * al
+          );
+        }
+      }
+
+      // 2. Vẽ 10 đường nan hoa nối từ vòng trong ra vòng ngoài
+      const r0 = rad[0] * scaleOpen;
+      const r5 = rad[5] * scaleOpen;
+      x.lineWidth = 0.7 * ss;
+      for (let i = 0; i < 10; i++) {
+        if (!pOnDiscTrig(Zc, r0, COS_10[i], SIN_10[i])) continue;
+        const x0 = PX, y0 = PY;
+        if (!pOnDiscTrig(Zc, r5, COS_10[i], SIN_10[i])) continue;
+        x.strokeStyle = 'hsla(' + hues[i % 6] + ',90%,78%,' + (0.1 * pr * al) + ')';
+        x.beginPath();
+        x.moveTo(x0, y0);
+        x.lineTo(PX, PY);
+        x.stroke();
+      }
+
+      // 3. Vẽ 2 vòng lục giác ma pháp xoay ở giữa
+      const r3 = rad[3] * scaleOpen;
+      for (let t = 0; t < 2; t++) {
+        x.strokeStyle = 'hsla(' + hues[t ? 1 : 4] + ',100%,82%,' + (0.32 * pr * al) + ')';
+        x.lineWidth = 1.1 * ss;
+        x.beginPath();
+        let f0 = true;
+        const baseA = t * (PI / 6) + d.spd[3] * phTau;
+        for (let i = 0; i <= 6; i++) {
+          const A = (i / 6) * TAU + baseA;
+          if (pOnDiscTrig(Zc, r3, Math.cos(A), Math.sin(A))) {
+            if (f0) {
+              x.moveTo(PX, PY);
+              f0 = false;
+            } else {
+              x.lineTo(PX, PY);
+            }
+          }
+        }
+        x.closePath();
+        x.stroke();
+      }
+
+      // 4. Vẽ các ký tự & bông hoa xoay tròn trên từng vòng (dùng Sprite Cache siêu mượt)
+      const prevAlpha = x.globalAlpha;
+      x.globalAlpha = 0.9 * al;
+      for (let gIdx = 0; gIdx < d.g.length; gIdx++) {
+        const gg = d.g[gIdx];
+        const spin = d.spd[gg.ring] * phTau;
+        const r = rad[gg.ring] * scaleOpen;
+        const n = gg.n;
+        for (let i = 0; i < n; i++) {
+          const A = (i / n) * TAU + spin;
+          if (!pOnDiscTrig(Zc, r, Math.cos(A), Math.sin(A))) continue;
+          const fs = Math.max(8, Math.min(52, gg.fm * PS));
+          const drawSz = fs * 1.45;
+          x.drawImage(gg.sprites[i], PX - drawSz * 0.5, PY - drawSz * 0.5, drawSz, drawSz);
+        }
+      }
+      x.globalAlpha = prevAlpha;
+
+      // 5. Vẽ tâm sáng và 14 tia sáng xoay ngược chiều ở tâm đĩa
+      if (Zc >= ZN * 0.5) {
+        const cpScale = F / Zc;
+        const cr = Math.max(1, rad[1] * scaleOpen * cpScale * 1.1);
+        const g = x.createRadialGradient(CX, CY, 0, CX, CY, cr);
+        g.addColorStop(0, 'rgba(255,255,255,' + (0.5 * pr * al) + ')');
+        g.addColorStop(0.35, 'hsla(' + d.hueA + ',100%,75%,' + (0.22 * pr * al) + ')');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        x.fillStyle = g;
+        x.beginPath();
+        x.arc(CX, CY, cr, 0, TAU);
+        x.fill();
+
+        const rRay = rad[1] * scaleOpen * 0.9;
+        x.lineWidth = 0.8 * ss;
+        for (let i = 0; i < 14; i++) {
+          const A = (i / 14) * TAU - phTau;
+          if (!pOnDiscTrig(Zc, rRay, Math.cos(A), Math.sin(A))) continue;
+          x.strokeStyle = 'hsla(' + d.rayHues[i] + ',100%,85%,' + (0.25 * pr * al) + ')';
+          x.beginPath();
+          x.moveTo(CX, CY);
+          x.lineTo(PX, PY);
+          x.stroke();
+        }
+      }
+    }
+
+    function drawBG() {
+      if (!BGC) {
+        BGC = document.createElement('canvas');
+        BGC.width = W;
+        BGC.height = H;
+        const b = BGC.getContext('2d');
+        const g = b.createRadialGradient(CX, CY, 40, CX, CY, Math.max(W, H) * 0.75);
+        g.addColorStop(0, '#2a1748');
+        g.addColorStop(0.45, '#110926');
+        g.addColorStop(1, '#04020a');
+        b.fillStyle = g;
+        b.fillRect(0, 0, W, H);
+      }
+      x.drawImage(BGC, 0, 0);
+    }
+
+    function drawStars() {
+      for (let i = 0; i < stars.length; i++) {
+        const s = stars[i];
+        const tw = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(T * 2.2 + s.p));
+        x.fillStyle = 'rgba(212,202,255,' + (tw * 0.6) + ')';
+        x.beginPath();
+        x.arc(s.x, s.y, s.s, 0, TAU);
+        x.fill();
+      }
+    }
+
+    let lastTime = performance.now();
+    let animationFrameId = 0;
+    let animationPaused = false;
+    window.addEventListener('message', (event) => {
+      if (event.source !== window.parent) return;
+      if (event.data?.type === 'pause-magic-disc') {
+        animationPaused = true;
+        window.cancelAnimationFrame(animationFrameId);
+      } else if (event.data?.type === 'resume-magic-disc' && animationPaused) {
+        animationPaused = false;
+        lastTime = performance.now();
+        animationFrameId = window.requestAnimationFrame(frame);
+      }
+    });
+    function frame(now) {
+      const dt = Math.min(0.05, Math.max(0.001, (now - lastTime) * 0.001)) * 1.8;
+      lastTime = now;
+      T += dt;
+      introT += dt;
+      ph = (T % LOOP) / LOOP;
+
+      // Hiệu ứng bung xoay đĩa + chớp sáng mở đầu (0 -> 1.6s)
+      const introProgress = Math.min(1, introT / 1.4);
+      const easeOut = 1 - Math.pow(1 - introProgress, 3);
+      const spinBoost = (1 - easeOut) * 2.8;
+      const scaleOpen = 0.25 + 0.75 * easeOut;
+      const GA = Math.min(1, introT / 0.9);
+
+      x.globalCompositeOperation = 'source-over';
+      drawBG();
+
+      x.globalCompositeOperation = 'lighter';
+      drawStars();
+
+      for (let i = 0; i < N; i++) {
+        const d = sortedDiscs[i];
+        d.z = ZF - ((ph + d.off) % 1) * (ZF - ZN);
+      }
+      sortedDiscs.sort((a, b) => b.z - a.z);
+
+      for (let i = 0; i < N; i++) {
+        drawDisc3D(sortedDiscs[i], spinBoost, scaleOpen, GA);
+      }
+
+      // Chớp sáng (flash) lúc đĩa mới bung xoay lúc đầu
+      if (introT < 0.75) {
+        const fp = introT / 0.75;
+        const fg = x.createRadialGradient(CX, CY, 0, CX, CY, Math.max(W, H) * 0.65);
+        fg.addColorStop(0, 'rgba(195,235,255,' + (0.65 * (1 - fp)) + ')');
+        fg.addColorStop(1, 'rgba(0,0,0,0)');
+        x.fillStyle = fg;
+        x.fillRect(0, 0, W, H);
+      }
+
+      x.globalCompositeOperation = 'source-over';
+      if (!VGC) {
+        VGC = document.createElement('canvas');
+        VGC.width = W;
+        VGC.height = H;
+        const b = VGC.getContext('2d');
+        const vg = b.createRadialGradient(CX, CY, Math.min(W, H) * 0.25, CX, CY, Math.max(W, H) * 0.75);
+        vg.addColorStop(0, 'rgba(0,0,0,0)');
+        vg.addColorStop(1, 'rgba(0,0,0,0.65)');
+        b.fillStyle = vg;
+        b.fillRect(0, 0, W, H);
+      }
+      x.drawImage(VGC, 0, 0);
+
+      animationFrameId = requestAnimationFrame(frame);
+    }
+
+    animationFrameId = requestAnimationFrame(frame);
+  </script>
+</body>
+</html>
